@@ -24,7 +24,7 @@ Fokus pada penguasaan bahasa pemrograman Dart dan persiapan environment.
 - [x] ⌨️ Advanced Dart
 - [x] ⌨️ Project Setup
 - [x] ⌨️ iOS App Setup
-- [ ] ⌨️ Android App Setup
+- [x] ⌨️ Android App Setup
 - [ ] ⌨️ Firebase Backend Setup
 - [ ] ⌨️ Basic Registration Screen
 - [ ] ⌨️ Login View
