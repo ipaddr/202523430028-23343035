@@ -28,8 +28,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final gwe = Person("Dzaki", 25);
   final gweKerja = Employee("Dzaki", 25, "Software Engineer");
+  final boxGenerics = Box<int, double>(42, 3.14);
 
   @override
   Widget build(BuildContext context) {
@@ -42,19 +42,40 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(getFullName("Dzaki", "Sultan")),
-            const SizedBox(height: 10),
-            Text("${Status.loading}"),
-            const SizedBox(height: 10),
-            Text(gwe.introduce()),
-            const SizedBox(height: 10),
             Text(gweKerja.introduce()),
             const SizedBox(height: 10),
-            Text("Area of Circle with radius 5: ${Circle(5).area()}"),
+            Text(gweKerja.upperCaseName),
             const SizedBox(height: 10),
-            Text(
-              "Car created with factory: ${Cars.create('BMW').model} (${Cars.create('BMW').year})",
+            // display fetch data
+            FutureBuilder<String>(
+              future: fetchData(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return Text(snapshot.data ?? 'No data');
+                }
+              },
             ),
+            const SizedBox(height: 10),
+            // display stream data
+            StreamBuilder<int>(
+              stream: countStream(5),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return Text('Count: ${snapshot.data}');
+                }
+              },
+            ),
+            const SizedBox(height: 10),
+            // display generics
+            Text('Box content: ${boxGenerics.content}, Metadata: ${boxGenerics.metadata}'),
           ],
         ),
       ),
@@ -181,4 +202,30 @@ class Cars {
       return Cars(model, 2010);
     }
   }
+}
+
+// extensions
+extension PersonExtension on Person {
+  String get upperCaseName => name.toUpperCase();
+}
+
+// Future and async
+Future<String> fetchData() async {
+  await Future.delayed(const Duration(seconds: 2)); // Simulasi delay
+  return "Data fetched successfully!";
+}
+
+// streams
+Stream<int> countStream(int to) async* {
+  for (int i = 1; i <= to; i++) {
+    await Future.delayed(const Duration(seconds: 1)); // Simulasi delay
+    yield i;
+  }
+}
+
+// generics
+class Box<T, U> {
+  T content;
+  U metadata;
+  Box(this.content, this.metadata);
 }

@@ -17,11 +17,11 @@ Fokus pada penguasaan bahasa pemrograman Dart dan persiapan environment.
 - [x] ⌨️ Introduction
 - [x] ⌨️ Developer Accounts
 - [x] ⌨️ Setup
-- [ ] ⌨️ Introduction to Dart
-- [ ] ⌨️ Dart Control Statements and Collections
-- [ ] ⌨️ Sound Null safety in Dart
-- [ ] ⌨️ Dart Enumerations, Classes and Objects
-- [ ] ⌨️ Advanced Dart
+- [x] ⌨️ Introduction to Dart
+- [x] ⌨️ Dart Control Statements and Collections
+- [x] ⌨️ Sound Null safety in Dart
+- [x] ⌨️ Dart Enumerations, Classes and Objects
+- [x] ⌨️ Advanced Dart
 - [ ] ⌨️ Project Setup
 - [ ] ⌨️ iOS App Setup
 - [ ] ⌨️ Android App Setup
