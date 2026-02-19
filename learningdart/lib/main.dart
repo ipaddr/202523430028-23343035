@@ -38,13 +38,72 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Text(getFullName('Dzaki', 'Sultan'))],
+          children: [
+            Text(getFullName('Dzaki', 'Sultan')),
+            const SizedBox(height: 20),
+            Text("5 is ${isPositive(5)}"),
+            Text("-3 is ${isPositive(-3)}"),
+            Text(" 0 is${isPositive(0)}"),
+            const SizedBox(height: 20),
+            Text("My score is 95, so its ${getGrade(95)}"),
+            const SizedBox(height: 20),
+            Text("Fruits: ${getFruits().join(', ')}"),
+            const SizedBox(height: 20),
+            Text("Unique Numbers: ${getUniqueNumbers().join(', ')}"),
+            const SizedBox(height: 20),
+            Text("Person Info: ${getPersonInfo()}"),
+          ],
         ),
       ),
     );
   }
 }
 
+// functions
 String getFullName(String firstName, String lastName) {
   return '$firstName $lastName';
+}
+
+// conditionals
+String isPositive(int number) {
+  if (number > 0) {
+    return 'Positive';
+  } else if (number < 0) {
+    return 'Negative';
+  } else {
+    return 'Zero';
+  }
+}
+
+// operators
+String getGrade(int score) {
+  if (score >= 90) {
+    return 'A';
+  } else if (score >= 80) {
+    return 'B';
+  } else if (score >= 70) {
+    return 'C';
+  } else if (score >= 60) {
+    return 'D';
+  } else {
+    return 'F';
+  }
+}
+
+// list
+List getFruits() {
+  return ['Apple', 'Banana', 'Orange'];
+}
+
+// sets
+Set getUniqueNumbers() {
+  Set<int> numbers = {1, 2, 3, 4, 5};
+  numbers.add(3); // Tidak akan ditambahkan karena sudah ada
+  numbers.add(6);
+  return numbers;
+}
+
+// maps
+Map getPersonInfo() {
+  return {'name': 'Dzaki Sultan', 'age': 25, 'city': 'Padang'};
 }
