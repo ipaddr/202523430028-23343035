@@ -31,7 +31,28 @@ class MainApp extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
       ),
-      home: const RegisterView(),
+      home: const HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('My Notes')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const RegisterView()),
+            );
+          },
+          child: const Text('Go to Register'),
+        ),
+      ),
     );
   }
 }

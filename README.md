@@ -25,10 +25,10 @@ Fokus pada penguasaan bahasa pemrograman Dart dan persiapan environment.
 - [x] ⌨️ Project Setup
 - [x] ⌨️ iOS App Setup
 - [x] ⌨️ Android App Setup
-- [ ] ⌨️ Firebase Backend Setup
-- [ ] ⌨️ Basic Registration Screen
-- [ ] ⌨️ Login View
-- [ ] ⌨️ Separating App Initialization from Login and Register
+- [x] ⌨️ Firebase Backend Setup
+- [x] ⌨️ Basic Registration Screen
+- [x] ⌨️ Login View
+- [x] ⌨️ Separating App Initialization from Login and Register
 
 ### Minggu 3: Firebase & Authentication
 
