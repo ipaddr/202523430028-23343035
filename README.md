@@ -22,8 +22,8 @@ Fokus pada penguasaan bahasa pemrograman Dart dan persiapan environment.
 - [x] ⌨️ Sound Null safety in Dart
 - [x] ⌨️ Dart Enumerations, Classes and Objects
 - [x] ⌨️ Advanced Dart
-- [ ] ⌨️ Project Setup
-- [ ] ⌨️ iOS App Setup
+- [x] ⌨️ Project Setup
+- [x] ⌨️ iOS App Setup
 - [ ] ⌨️ Android App Setup
 - [ ] ⌨️ Firebase Backend Setup
 - [ ] ⌨️ Basic Registration Screen
