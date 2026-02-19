@@ -28,6 +28,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final gwe = Person("Dzaki", 25);
+  final gweKerja = Employee("Dzaki", 25, "Software Engineer");
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,11 +42,19 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Null Safety Demo: ${getNullSafetyDemo()}"),
-            const SizedBox(height: 20),
-            Text("Null Aware Demo: ${getNullAwareDemo(null)}"),
-            const SizedBox(height: 20),
-            Text("conditional invocation demo:"),
+            Text(getFullName("Dzaki", "Sultan")),
+            const SizedBox(height: 10),
+            Text("${Status.loading}"),
+            const SizedBox(height: 10),
+            Text(gwe.introduce()),
+            const SizedBox(height: 10),
+            Text(gweKerja.introduce()),
+            const SizedBox(height: 10),
+            Text("Area of Circle with radius 5: ${Circle(5).area()}"),
+            const SizedBox(height: 10),
+            Text(
+              "Car created with factory: ${Cars.create('BMW').model} (${Cars.create('BMW').year})",
+            ),
           ],
         ),
       ),
@@ -112,4 +123,62 @@ String getNullSafetyDemo() {
 // null aware operator
 String getNullAwareDemo(String? input) {
   return input ?? "Default Value";
+}
+
+// enums
+enum Status { success, error, loading }
+
+// classes
+class Person {
+  String name;
+  int age;
+
+  Person(this.name, this.age);
+  String introduce() {
+    return "Hi, I'm $name and I'm $age years old.";
+  }
+}
+
+// inheritance
+class Employee extends Person {
+  String position;
+
+  Employee(super.name, super.age, this.position);
+
+  @override
+  String introduce() {
+    return "${super.introduce()} and I work as a $position.";
+  }
+}
+
+// abstract class
+abstract class Shape {
+  double area();
+}
+
+class Circle extends Shape {
+  double radius;
+
+  Circle(this.radius);
+
+  @override
+  double area() {
+    return 3.14 * radius * radius;
+  }
+}
+
+// factory constructor
+class Cars {
+  String model;
+  int year;
+
+  Cars(this.model, this.year);
+
+  factory Cars.create(String model) {
+    if (model == 'Tesla') {
+      return Cars(model, 2020);
+    } else {
+      return Cars(model, 2010);
+    }
+  }
 }
