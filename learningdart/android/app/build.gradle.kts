@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.learningdart"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // ndkVersion = flutter.ndkVersion  // disabled: system NDK is missing/corrupt (install matching NDK or restore this line)
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

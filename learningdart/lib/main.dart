@@ -39,19 +39,11 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(getFullName('Dzaki', 'Sultan')),
+            Text("Null Safety Demo: ${getNullSafetyDemo()}"),
             const SizedBox(height: 20),
-            Text("5 is ${isPositive(5)}"),
-            Text("-3 is ${isPositive(-3)}"),
-            Text(" 0 is${isPositive(0)}"),
+            Text("Null Aware Demo: ${getNullAwareDemo(null)}"),
             const SizedBox(height: 20),
-            Text("My score is 95, so its ${getGrade(95)}"),
-            const SizedBox(height: 20),
-            Text("Fruits: ${getFruits().join(', ')}"),
-            const SizedBox(height: 20),
-            Text("Unique Numbers: ${getUniqueNumbers().join(', ')}"),
-            const SizedBox(height: 20),
-            Text("Person Info: ${getPersonInfo()}"),
+            Text("conditional invocation demo:"),
           ],
         ),
       ),
@@ -106,4 +98,18 @@ Set getUniqueNumbers() {
 // maps
 Map getPersonInfo() {
   return {'name': 'Dzaki Sultan', 'age': 25, 'city': 'Padang'};
+}
+
+// null safety
+String getNullSafetyDemo() {
+  String? nullableString; // Bisa null
+  String nonNullableString = "ini non null"; // Tidak bisa null
+
+  // Menggunakan null aware operator
+  return nullableString ?? nonNullableString;
+}
+
+// null aware operator
+String getNullAwareDemo(String? input) {
+  return input ?? "Default Value";
 }
