@@ -35,7 +35,7 @@ Fokus pada penguasaan bahasa pemrograman Dart dan persiapan environment.
 Integrasi Backend dan pembuatan alur otentikasi user.
 
 - [x] ⌨️ Setting up Git and GitHub
-- [ ] ⌨️ Email Verification View
+- [x] ⌨️ Email Verification View
 - [ ] ⌨️ Link Between Login and Register Views
 - [ ] ⌨️ Logout View
 - [ ] ⌨️ Go From Login to Notes View
