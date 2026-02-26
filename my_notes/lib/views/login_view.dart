@@ -28,94 +28,108 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          TextField(
-            controller: emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Login')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+              autofillHints: const [AutofillHints.email],
             ),
-            autofillHints: const [AutofillHints.email],
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+              ),
+              autofillHints: const [AutofillHints.password],
             ),
-            autofillHints: const [AutofillHints.password],
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              final email = emailController.text.trim();
-              final password = passwordController.text.trim();
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final email = emailController.text.trim();
+                final password = passwordController.text.trim();
 
-              // Basic validation
-              if (email.isEmpty || password.isEmpty) {
-                messenger.showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter email and password'),
-                  ),
-                );
-                return;
-              } else if (password.length < 6) {
-                messenger.showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Password must be at least 6 characters long',
-                    ),
-                  ),
-                );
-                return;
-              } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
-                messenger.showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter a valid email address'),
-                  ),
-                );
-                return;
-              }
-
-              try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
-                  email: email,
-                  password: password,
-                );
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'wrong-password' || e.code == 'user-not-found') {
+                // Basic validation
+                if (email.isEmpty || password.isEmpty) {
                   messenger.showSnackBar(
-                    const SnackBar(content: Text('Invalid email or password.')),
+                    const SnackBar(
+                      content: Text('Please enter email and password'),
+                    ),
                   );
                   return;
-                } else {
+                } else if (password.length < 6) {
                   messenger.showSnackBar(
-                    SnackBar(
-                      content: Text(e.message ?? 'Authentication error.'),
+                    const SnackBar(
+                      content: Text(
+                        'Password must be at least 6 characters long',
+                      ),
+                    ),
+                  );
+                  return;
+                } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a valid email address'),
                     ),
                   );
                   return;
                 }
-              } catch (e) {
-                messenger.showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'An unexpected error occurred. Please try again.',
+
+                try {
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    email: email,
+                    password: password,
+                  );
+                } on FirebaseAuthException catch (e) {
+                  if (e.code == 'wrong-password' ||
+                      e.code == 'user-not-found') {
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('Invalid email or password.'),
+                      ),
+                    );
+                    return;
+                  } else {
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(e.message ?? 'Authentication error.'),
+                      ),
+                    );
+                    return;
+                  }
+                } catch (e) {
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'An unexpected error occurred. Please try again.',
+                      ),
                     ),
-                  ),
-                );
-              }
-            },
-            child: const Text('Login'),
-          ),
-        ],
+                  );
+                }
+              },
+              child: const Text('Login'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil('/register', (route) => false);
+              },
+              child: const Text('Don\'t have an account? Sign up'),
+            ),
+          ],
+        ),
       ),
     );
   }
