@@ -103,7 +103,7 @@ class _RegisterViewState extends State<RegisterView> {
                   if (!context.mounted) return;
                   Navigator.of(
                     context,
-                  ).pushNamedAndRemoveUntil('/home', (route) => false);
+                  ).pushNamedAndRemoveUntil('/notes', (route) => false);
                 } on FirebaseAuthException catch (e) {
                   if (e.code == 'email-already-in-use') {
                     messenger.showSnackBar(

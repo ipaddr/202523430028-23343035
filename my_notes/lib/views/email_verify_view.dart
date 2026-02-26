@@ -85,7 +85,7 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                         if (!context.mounted) return;
                         Navigator.of(
                           context,
-                        ).pushNamedAndRemoveUntil('/home', (route) => false);
+                        ).pushNamedAndRemoveUntil('/notes', (route) => false);
                       } else {
                         messenger.showSnackBar(
                           const SnackBar(
