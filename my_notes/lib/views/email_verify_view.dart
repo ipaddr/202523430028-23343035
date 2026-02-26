@@ -76,12 +76,16 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                       final refreshedUser = FirebaseAuth.instance.currentUser;
                       if (refreshedUser != null &&
                           refreshedUser.emailVerified == true) {
-                        setState(() {});
                         messenger.showSnackBar(
                           const SnackBar(
                             content: Text('Email verified successfully.'),
                           ),
                         );
+                        // navigate back to home; HomePage will now show NotesView
+                        if (!context.mounted) return;
+                        Navigator.of(
+                          context,
+                        ).pushNamedAndRemoveUntil('/home', (route) => false);
                       } else {
                         messenger.showSnackBar(
                           const SnackBar(

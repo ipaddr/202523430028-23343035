@@ -98,6 +98,12 @@ class _RegisterViewState extends State<RegisterView> {
                   messenger.showSnackBar(
                     const SnackBar(content: Text('Registration successful!')),
                   );
+                  // after creating account, go to home (which will likely show
+                  // the email-verify screen because user.emailVerified is false).
+                  if (!context.mounted) return;
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/home', (route) => false);
                 } on FirebaseAuthException catch (e) {
                   if (e.code == 'email-already-in-use') {
                     messenger.showSnackBar(

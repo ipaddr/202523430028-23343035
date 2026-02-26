@@ -91,6 +91,11 @@ class _LoginViewState extends State<LoginView> {
                     email: email,
                     password: password,
                   );
+                  // successful login → re-run HomePage logic
+                  if (!context.mounted) return;
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/home', (route) => false);
                 } on FirebaseAuthException catch (e) {
                   if (e.code == 'wrong-password' ||
                       e.code == 'user-not-found') {

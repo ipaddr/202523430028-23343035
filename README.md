@@ -37,7 +37,7 @@ Integrasi Backend dan pembuatan alur otentikasi user.
 - [x] ⌨️ Setting up Git and GitHub
 - [x] ⌨️ Email Verification View
 - [x] ⌨️ Link Between Login and Register Views
-- [ ] ⌨️ Logout View
+- [x] ⌨️ Logout View
 - [ ] ⌨️ Go From Login to Notes View
 - [ ] ⌨️ Cleaning Up our Routes
 - [ ] ⌨️ Error Handling in Login View
