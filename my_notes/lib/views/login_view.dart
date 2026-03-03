@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_notes/constants/routes.dart';
+import 'package:my_notes/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -57,35 +58,8 @@ class _LoginViewState extends State<LoginView> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
-                final messenger = ScaffoldMessenger.of(context);
                 final email = emailController.text.trim();
                 final password = passwordController.text.trim();
-
-                // Basic validation
-                if (email.isEmpty || password.isEmpty) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter email and password'),
-                    ),
-                  );
-                  return;
-                } else if (password.length < 6) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Password must be at least 6 characters long',
-                      ),
-                    ),
-                  );
-                  return;
-                } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid email address'),
-                    ),
-                  );
-                  return;
-                }
 
                 try {
                   await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -98,29 +72,32 @@ class _LoginViewState extends State<LoginView> {
                     context,
                   ).pushNamedAndRemoveUntil(notesRoutes, (route) => false);
                 } on FirebaseAuthException catch (e) {
-                  if (e.code == 'wrong-password' ||
-                      e.code == 'user-not-found') {
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('Invalid email or password.'),
-                      ),
-                    );
-                    return;
-                  } else {
-                    messenger.showSnackBar(
-                      SnackBar(
-                        content: Text(e.message ?? 'Authentication error.'),
-                      ),
-                    );
-                    return;
+                  String errorMessage;
+                  switch (e.code) {
+                    case 'invalid-credential':
+                      errorMessage =
+                          'Invalid email or password. (code: ${e.code})';
+                      break;
+                    case 'user-not-found':
+                      errorMessage =
+                          'No account found for this email. (code: ${e.code})';
+                      break;
+                    case 'invalid-email':
+                      errorMessage =
+                          'Email address is not valid. (code: ${e.code})';
+                      break;
+                    default:
+                      errorMessage =
+                          'Login failed: ${e.message} (code: ${e.code})';
                   }
+
+                  if (!context.mounted) return;
+                  await showErrorDialog(context, errorMessage);
                 } catch (e) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'An unexpected error occurred. Please try again.',
-                      ),
-                    ),
+                  if (!context.mounted) return;
+                  await showErrorDialog(
+                    context,
+                    'An unexpected error occurred: $e',
                   );
                 }
               },
