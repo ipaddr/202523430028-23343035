@@ -42,7 +42,7 @@ Integrasi Backend dan pembuatan alur otentikasi user.
 - [x] ⌨️ Cleaning Up our Routes
 - [x] ⌨️ Error Handling in Login View
 - [x] ⌨️ Error Handling in Register View, Next Screen After
-- [ ] ⌨️ Confirming Identity Before Going to Main UI
+- [x] ⌨️ Confirming Identity Before Going to Main UI
 - [ ] ⌨️ Auth Service
 - [ ] ⌨️ Migrating to Auth Service
 - [ ] ⌨️ Unit Testing our AuthService
