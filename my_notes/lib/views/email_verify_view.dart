@@ -20,7 +20,9 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
           Center(
             child: Column(
               children: [
-                const Text('Please verify your email address.'),
+                const Text(
+                  'We have sent you a verification email. Please check your inbox and verify your email address.',
+                ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () async {
@@ -57,7 +59,7 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                       );
                     }
                   },
-                  child: const Text('Send Verification Email'),
+                  child: const Text('Resend Verification Email'),
                 ),
                 const SizedBox(height: 16),
                 TextButton(
