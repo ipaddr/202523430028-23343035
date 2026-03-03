@@ -39,7 +39,7 @@ Integrasi Backend dan pembuatan alur otentikasi user.
 - [x] ⌨️ Link Between Login and Register Views
 - [x] ⌨️ Logout View
 - [x] ⌨️ Go From Login to Notes View
-- [ ] ⌨️ Cleaning Up our Routes
+- [x] ⌨️ Cleaning Up our Routes
 - [ ] ⌨️ Error Handling in Login View
 - [ ] ⌨️ Error Handling in Register View, Next Screen After
 - [ ] ⌨️ Confirming Identity Before Going to Main UI

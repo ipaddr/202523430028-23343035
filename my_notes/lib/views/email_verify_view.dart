@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_notes/constants/routes.dart';
 
 class EmailVerifyView extends StatefulWidget {
   const EmailVerifyView({super.key});
@@ -83,9 +84,10 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                         );
                         // navigate back to home; HomePage will now show NotesView
                         if (!context.mounted) return;
-                        Navigator.of(
-                          context,
-                        ).pushNamedAndRemoveUntil('/notes', (route) => false);
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          notesRoutes,
+                          (route) => false,
+                        );
                       } else {
                         messenger.showSnackBar(
                           const SnackBar(
