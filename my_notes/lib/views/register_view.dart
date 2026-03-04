@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_notes/constants/routes.dart';
+import 'package:my_notes/services/auth/auth_exceptions.dart';
+import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
@@ -93,14 +94,14 @@ class _RegisterViewState extends State<RegisterView> {
                 }
 
                 try {
-                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  await AuthService.firebase().createUser(
                     email: email,
                     password: password,
                   );
 
-                  final user = FirebaseAuth.instance.currentUser;
-                  if (user != null && !user.emailVerified) {
-                    await user.sendEmailVerification();
+                  final user = AuthService.firebase().currentUser;
+                  if (user != null && !user.isEmailVerified) {
+                    await AuthService.firebase().sendEmailVerification();
                   }
 
                   messenger.showSnackBar(
@@ -112,38 +113,14 @@ class _RegisterViewState extends State<RegisterView> {
                     verifyEmailRoutes,
                     (route) => false,
                   );
-                } on FirebaseAuthException catch (e) {
-                  String errorMessage;
-                  switch (e.code) {
-                    case 'email-already-in-use':
-                      errorMessage =
-                          'This email is already in use. (code: ${e.code})';
-                      break;
-                    case 'invalid-email':
-                      errorMessage =
-                          'The email address is not valid. (code: ${e.code})';
-                      break;
-                    case 'operation-not-allowed':
-                      errorMessage =
-                          'Email/password accounts are not enabled. (code: ${e.code})';
-                      break;
-                    case 'weak-password':
-                      errorMessage =
-                          'The password is too weak. Please choose a stronger password. (code: ${e.code})';
-                      break;
-                    default:
-                      errorMessage =
-                          'Registration failed: ${e.message} (code: ${e.code})';
-                  }
-
-                  if (!context.mounted) return;
-                  await showErrorDialog(context, errorMessage);
-                } catch (e) {
-                  if (!context.mounted) return;
-                  await showErrorDialog(
-                    context,
-                    'An unexpected error occurred: $e',
-                  );
+                } on WeakPasswordAuthException {
+                  await showErrorDialog(context, 'Weak Password');
+                } on EmailAlreadyInUseAuthException {
+                  await showErrorDialog(context, 'Email is already in use');
+                } on InvalidEmailAuthException {
+                  await showErrorDialog(context, 'Invalid email address');
+                } on GenericAuthException {
+                  await showErrorDialog(context, 'Failed to register');
                 }
               },
               child: const Text('Register'),

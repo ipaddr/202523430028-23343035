@@ -1,6 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_notes/constants/routes.dart';
+import 'package:my_notes/services/auth/auth_exceptions.dart';
+import 'package:my_notes/services/auth/auth_service.dart';
+import 'package:my_notes/utilities/show_error_dialog.dart';
 
 class EmailVerifyView extends StatefulWidget {
   const EmailVerifyView({super.key});
@@ -26,7 +28,7 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () async {
-                    final user = FirebaseAuth.instance.currentUser;
+                    final user = AuthService.firebase().currentUser;
                     final messenger = ScaffoldMessenger.of(context);
                     if (user == null) {
                       messenger.showSnackBar(
@@ -37,25 +39,17 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                       return;
                     }
                     try {
-                      await user.sendEmailVerification();
+                      await AuthService.firebase().sendEmailVerification();
                       messenger.showSnackBar(
                         const SnackBar(
                           content: Text('Verification email sent.'),
                         ),
                       );
-                    } on FirebaseAuthException catch (e) {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            e.message ?? 'Failed to send verification email.',
-                          ),
-                        ),
-                      );
-                    } catch (_) {
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('Failed to send verification email.'),
-                        ),
+                    } on GenericAuthException {
+                      if (!context.mounted) return;
+                      await showErrorDialog(
+                        context,
+                        'Failed to send verification email. Please try again later.',
                       );
                     }
                   },
@@ -64,7 +58,7 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () async {
-                    final user = FirebaseAuth.instance.currentUser;
+                    final user = AuthService.firebase().currentUser;
                     final messenger = ScaffoldMessenger.of(context);
                     if (user == null) {
                       messenger.showSnackBar(
@@ -75,10 +69,10 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                       return;
                     }
                     try {
-                      await user.reload();
-                      final refreshedUser = FirebaseAuth.instance.currentUser;
-                      if (refreshedUser != null &&
-                          refreshedUser.emailVerified == true) {
+                      // refresh the user through the auth service
+                      await AuthService.firebase().reloadUser();
+                      final refreshedUser = AuthService.firebase().currentUser;
+                      if (refreshedUser != null && refreshedUser.isEmailVerified) {
                         messenger.showSnackBar(
                           const SnackBar(
                             content: Text('Email verified successfully.'),
@@ -99,22 +93,17 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                           ),
                         );
                       }
-                    } on FirebaseAuthException catch (e) {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            e.message ??
-                                'Failed to check verification status. Please try again.',
-                          ),
-                        ),
+                    } on GenericAuthException {
+                      if (!context.mounted) return;
+                      await showErrorDialog(
+                        context,
+                        'Failed to check verification status. Please try again later.',
                       );
                     } catch (_) {
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Failed to check verification status. Please try again.',
-                          ),
-                        ),
+                      if (!context.mounted) return;
+                      await showErrorDialog(
+                        context,
+                        'An unexpected error occurred. Please try again later.',
                       );
                     }
                   },
