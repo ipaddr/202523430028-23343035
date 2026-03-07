@@ -46,7 +46,7 @@ Integrasi Backend dan pembuatan alur otentikasi user.
 - [x] ⌨️ Auth Service
 - [x] ⌨️ Migrating to Auth Service
 - [x] ⌨️ Unit Testing our AuthService
-- [ ] ⌨️ CRUD Local Storage
+- [x] ⌨️ CRUD Local Storage
 
 ### Minggu 4: Notes Service & Cloud Firestore
 
