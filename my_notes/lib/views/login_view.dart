@@ -1,5 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_notes/constants/routes.dart';
+import 'package:my_notes/services/auth/auth_exceptions.dart';
+import 'package:my_notes/services/auth/auth_service.dart';
+import 'package:my_notes/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -56,69 +59,45 @@ class _LoginViewState extends State<LoginView> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
-                final messenger = ScaffoldMessenger.of(context);
                 final email = emailController.text.trim();
                 final password = passwordController.text.trim();
 
-                // Basic validation
-                if (email.isEmpty || password.isEmpty) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter email and password'),
-                    ),
-                  );
-                  return;
-                } else if (password.length < 6) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Password must be at least 6 characters long',
-                      ),
-                    ),
-                  );
-                  return;
-                } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid email address'),
-                    ),
-                  );
-                  return;
-                }
-
                 try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  await AuthService.firebase().logIn(
                     email: email,
                     password: password,
                   );
-                } on FirebaseAuthException catch (e) {
-                  if (e.code == 'wrong-password' ||
-                      e.code == 'user-not-found') {
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('Invalid email or password.'),
-                      ),
-                    );
-                    return;
-                  } else {
-                    messenger.showSnackBar(
-                      SnackBar(
-                        content: Text(e.message ?? 'Authentication error.'),
-                      ),
-                    );
-                    return;
-                  }
-                } catch (e) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'An unexpected error occurred. Please try again.',
-                      ),
-                    ),
+                  // successful login → re-run NotesView logic
+                  if (!context.mounted) return;
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil(notesRoutes, (route) => false);
+                } on UserNotFoundAuthException {
+                  await showErrorDialog(
+                    context,
+                    'No user found for that email.',
+                  );
+                } on WrongPasswordAuthException {
+                  await showErrorDialog(
+                    context,
+                    'Wrong password provided for that user.',
+                  );
+                } on GenericAuthException {
+                  await showErrorDialog(
+                    context,
+                    'Authentication error occurred.',
                   );
                 }
               },
               child: const Text('Login'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(registerRoutes, (route) => false);
+              },
+              child: const Text('Don\'t have an account? Sign up'),
             ),
           ],
         ),

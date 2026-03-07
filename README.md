@@ -34,19 +34,19 @@ Fokus pada penguasaan bahasa pemrograman Dart dan persiapan environment.
 
 Integrasi Backend dan pembuatan alur otentikasi user.
 
-- [ ] ⌨️ Setting up Git and GitHub
-- [ ] ⌨️ Email Verification View
-- [ ] ⌨️ Link Between Login and Register Views
-- [ ] ⌨️ Logout View
-- [ ] ⌨️ Go From Login to Notes View
-- [ ] ⌨️ Cleaning Up our Routes
-- [ ] ⌨️ Error Handling in Login View
-- [ ] ⌨️ Error Handling in Register View, Next Screen After
-- [ ] ⌨️ Confirming Identity Before Going to Main UI
-- [ ] ⌨️ Auth Service
-- [ ] ⌨️ Migrating to Auth Service
-- [ ] ⌨️ Unit Testing our AuthService
-- [ ] ⌨️ CRUD Local Storage
+- [x] ⌨️ Setting up Git and GitHub
+- [x] ⌨️ Email Verification View
+- [x] ⌨️ Link Between Login and Register Views
+- [x] ⌨️ Logout View
+- [x] ⌨️ Go From Login to Notes View
+- [x] ⌨️ Cleaning Up our Routes
+- [x] ⌨️ Error Handling in Login View
+- [x] ⌨️ Error Handling in Register View, Next Screen After
+- [x] ⌨️ Confirming Identity Before Going to Main UI
+- [x] ⌨️ Auth Service
+- [x] ⌨️ Migrating to Auth Service
+- [x] ⌨️ Unit Testing our AuthService
+- [x] ⌨️ CRUD Local Storage
 
 ### Minggu 4: Notes Service & Cloud Firestore
 

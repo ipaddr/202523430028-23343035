@@ -1,5 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_notes/constants/routes.dart';
+import 'package:my_notes/services/auth/auth_exceptions.dart';
+import 'package:my_notes/services/auth/auth_service.dart';
+import 'package:my_notes/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -34,7 +37,6 @@ class _RegisterViewState extends State<RegisterView> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const SizedBox(height: 16),
             // Email field
             TextField(
               decoration: const InputDecoration(
@@ -59,7 +61,7 @@ class _RegisterViewState extends State<RegisterView> {
               autofillHints: const [AutofillHints.password],
             ),
             const SizedBox(height: 16),
-            TextButton(
+            ElevatedButton(
               onPressed: () async {
                 final messenger = ScaffoldMessenger.of(context);
                 final email = emailController.text.trim();
@@ -92,58 +94,44 @@ class _RegisterViewState extends State<RegisterView> {
                 }
 
                 try {
-                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  await AuthService.firebase().createUser(
                     email: email,
                     password: password,
                   );
+
+                  final user = AuthService.firebase().currentUser;
+                  if (user != null && !user.isEmailVerified) {
+                    await AuthService.firebase().sendEmailVerification();
+                  }
+
                   messenger.showSnackBar(
                     const SnackBar(content: Text('Registration successful!')),
                   );
-                } on FirebaseAuthException catch (e) {
-                  if (e.code == 'email-already-in-use') {
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('This email is already in use.'),
-                      ),
-                    );
-                  } else if (e.code == 'invalid-email') {
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('The email address is not valid.'),
-                      ),
-                    );
-                  } else if (e.code == 'operation-not-allowed') {
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Email/password accounts are not enabled.',
-                        ),
-                      ),
-                    );
-                  } else if (e.code == 'weak-password') {
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('The password is too weak.'),
-                      ),
-                    );
-                  } else {
-                    messenger.showSnackBar(
-                      SnackBar(
-                        content: Text('Registration failed: ${e.message}'),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'An unexpected error occurred. Please try again.',
-                      ),
-                    ),
+
+                  if (!context.mounted) return;
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    verifyEmailRoutes,
+                    (route) => false,
                   );
+                } on WeakPasswordAuthException {
+                  await showErrorDialog(context, 'Weak Password');
+                } on EmailAlreadyInUseAuthException {
+                  await showErrorDialog(context, 'Email is already in use');
+                } on InvalidEmailAuthException {
+                  await showErrorDialog(context, 'Invalid email address');
+                } on GenericAuthException {
+                  await showErrorDialog(context, 'Failed to register');
                 }
               },
               child: const Text('Register'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(loginRoutes, (route) => false);
+              },
+              child: const Text('Already have an account? Login'),
             ),
           ],
         ),
