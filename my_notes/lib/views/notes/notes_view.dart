@@ -64,6 +64,7 @@ class _NotesViewState extends State<NotesView> {
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
+                    case ConnectionState.active:
                       return Center(child: Text('Loading notes...'));
                     default:
                       return Center(child: const CircularProgressIndicator());
