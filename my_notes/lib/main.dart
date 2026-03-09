@@ -23,10 +23,10 @@ class MainApp extends StatelessWidget {
       title: 'My Notes',
       theme: ThemeData(
         // custom colors
-        primaryColor: const Color(0xFF014BAA), // Royal Blue
-        scaffoldBackgroundColor: const Color(0xFFF8F3F0), // Light Cream
+        primaryColor: const Color(0xFF004643), // Cyprus
+        scaffoldBackgroundColor: const Color(0xFFFAFAFA), // Cloud White
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF014BAA),
+          backgroundColor: Color(0xFF004643),
           foregroundColor: Colors.white,
         ),
       ),

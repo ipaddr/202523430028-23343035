@@ -57,7 +57,7 @@ Implementasi fitur utama catatan menggunakan Stream dan Cloud Database.
 - [x] ⌨️ (20:39:21) Preparing to Create New Notes
 - [x] ⌨️ (21:00:16) Creating New Notes
 - [x] ⌨️ (21:35:42) Displaying Notes in Notes View
-- [ ] ⌨️ (21:56:04) Deleting Existing Notes in Notes View
+- [x] ⌨️ (21:56:04) Deleting Existing Notes in Notes View
 - [ ] ⌨️ (22:40:46) Updating Existing Notes
 - [ ] ⌨️ (23:14:12) Protecting NotesService with Current User
 - [ ] ⌨️ (23:40:44) Writing Notes to Cloud Firestore
