@@ -54,7 +54,7 @@ Implementasi fitur utama catatan menggunakan Stream dan Cloud Database.
 
 - [x] ⌨️ (19:30:57) Working with Streams in Notes Service
 - [x] ⌨️ (20:04:32) Preparing Notes View to Read All Notes
-- [ ] ⌨️ (20:39:21) Preparing to Create New Notes
+- [x] ⌨️ (20:39:21) Preparing to Create New Notes
 - [ ] ⌨️ (21:00:16) Creating New Notes
 - [ ] ⌨️ (21:35:42) Displaying Notes in Notes View
 - [ ] ⌨️ (21:56:04) Deleting Existing Notes in Notes View

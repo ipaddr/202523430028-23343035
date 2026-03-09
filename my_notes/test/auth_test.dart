@@ -61,6 +61,7 @@ void main() {
       );
       expect(provider.currentUser, user);
       expect(user.isEmailVerified, false);
+      expect(user.email, 'user@example.com');
     });
 
     test('logged in user should be able to get verified', () async {
@@ -68,6 +69,7 @@ void main() {
       final user = provider.currentUser;
       expect(user, isNotNull);
       expect(user!.isEmailVerified, true);
+      expect(user.email, 'user@example.com');
     });
 
     test('should be able to log out and log in again', () async {
@@ -78,6 +80,7 @@ void main() {
         password: 'password',
       );
       expect(provider.currentUser, user);
+      expect(user.email, 'user@example.com');
     });
 
     // tests for reloadUser()
@@ -150,7 +153,7 @@ class MockAuthProvider implements AuthProvider {
     // throw when the *provided* password is wrong, not when it matches a hardcoded
     // value. All tests treat "password" as the correct credential.
     if (password != 'password') throw WrongPasswordAuthException();
-    const user = AuthUser(isEmailVerified: false);
+    final user = AuthUser(isEmailVerified: false, email: email);
     _user = user;
     return Future.value(user);
   }
@@ -178,7 +181,7 @@ class MockAuthProvider implements AuthProvider {
     if (!isInitialized) throw NotInitializedException();
     final user = _user;
     if (user == null) throw UserNotFoundAuthException();
-    const newUser = AuthUser(isEmailVerified: true);
+    final newUser = AuthUser(isEmailVerified: true, email: user.email);
     _user = newUser;
     return Future.value();
   }
