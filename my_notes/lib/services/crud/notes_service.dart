@@ -86,7 +86,22 @@ class NotesService {
 
   Stream<List<DatabaseNote>> get notesStream => _notesStreamController.stream;
 
+  static final NotesService _shared = NotesService._sharedInstance();
+  NotesService._sharedInstance() {
+    _notesStreamController.onListen = () =>
+        _notesStreamController.add(_cachedNotes);
+  }
+  factory NotesService() => _shared;
+
   Database get _currentDb => _db ?? (throw DatabaseIsNotOpenException());
+
+  Future<void> _ensureDbIsOpen() async {
+    try {
+      await open();
+    } on DatabaseAlreadyOpenException {
+      // noop
+    }
+  }
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
 
@@ -115,6 +130,7 @@ class NotesService {
   // ── User operations ─────────────────────────────────────────────────────────
 
   Future<DatabaseUser> getUser({required String email}) async {
+    await _ensureDbIsOpen();
     final rows = await _currentDb.query(
       _Tables.user,
       limit: 1,
@@ -126,6 +142,7 @@ class NotesService {
   }
 
   Future<DatabaseUser> createUser({required String email}) async {
+    await _ensureDbIsOpen();
     final normalized = email.toLowerCase();
 
     final existing = await _currentDb.query(
@@ -149,6 +166,7 @@ class NotesService {
   }
 
   Future<void> deleteUser({required String email}) async {
+    await _ensureDbIsOpen();
     final count = await _currentDb.delete(
       _Tables.user,
       where: 'email = ?',
@@ -160,6 +178,7 @@ class NotesService {
   // ── Note operations ─────────────────────────────────────────────────────────
 
   Future<DatabaseNote> getNote({required int id}) async {
+    await _ensureDbIsOpen();
     final rows = await _currentDb.query(
       _Tables.note,
       limit: 1,
@@ -176,6 +195,7 @@ class NotesService {
   Future<Iterable<DatabaseNote>> getAllNotes({
     required DatabaseUser owner,
   }) async {
+    await _ensureDbIsOpen();
     final rows = await _currentDb.query(
       _Tables.note,
       where: 'user_id = ?',
@@ -185,6 +205,7 @@ class NotesService {
   }
 
   Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
+    await _ensureDbIsOpen();
     final verified = await getUser(email: owner.email);
     if (verified != owner) throw CouldNotFindUserException();
 
@@ -209,6 +230,7 @@ class NotesService {
     required DatabaseNote note,
     required String text,
   }) async {
+    await _ensureDbIsOpen();
     final count = await _currentDb.update(
       _Tables.note,
       {'text': text, 'is_synced_with_cloud': 0},
@@ -223,6 +245,7 @@ class NotesService {
   }
 
   Future<void> deleteNote({required int id}) async {
+    await _ensureDbIsOpen();
     final count = await _currentDb.delete(
       _Tables.note,
       where: 'id = ?',
@@ -235,6 +258,7 @@ class NotesService {
   }
 
   Future<int> deleteAllNotes() async {
+    await _ensureDbIsOpen();
     final count = await _currentDb.delete(_Tables.note);
     _cachedNotes.clear();
     _notesStreamController.add(_cachedNotes);
