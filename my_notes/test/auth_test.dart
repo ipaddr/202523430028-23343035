@@ -62,6 +62,8 @@ void main() {
       expect(provider.currentUser, user);
       expect(user.isEmailVerified, false);
       expect(user.email, 'user@example.com');
+      // id should be non-empty (mock generates a simple string)
+      expect(user.id, isNotEmpty);
     });
 
     test('logged in user should be able to get verified', () async {
@@ -70,6 +72,7 @@ void main() {
       expect(user, isNotNull);
       expect(user!.isEmailVerified, true);
       expect(user.email, 'user@example.com');
+      expect(user.id, isNotEmpty);
     });
 
     test('should be able to log out and log in again', () async {
@@ -81,6 +84,7 @@ void main() {
       );
       expect(provider.currentUser, user);
       expect(user.email, 'user@example.com');
+      expect(user.id, isNotEmpty);
     });
 
     // tests for reloadUser()
@@ -153,7 +157,14 @@ class MockAuthProvider implements AuthProvider {
     // throw when the *provided* password is wrong, not when it matches a hardcoded
     // value. All tests treat "password" as the correct credential.
     if (password != 'password') throw WrongPasswordAuthException();
-    final user = AuthUser(isEmailVerified: false, email: email);
+    // generate a crude unique id; in real life you'd use a UUID or
+    // Firebase uid.
+    final generatedId = DateTime.now().millisecondsSinceEpoch.toString();
+    final user = AuthUser(
+      id: generatedId,
+      isEmailVerified: false,
+      email: email,
+    );
     _user = user;
     return Future.value(user);
   }
@@ -181,7 +192,11 @@ class MockAuthProvider implements AuthProvider {
     if (!isInitialized) throw NotInitializedException();
     final user = _user;
     if (user == null) throw UserNotFoundAuthException();
-    final newUser = AuthUser(isEmailVerified: true, email: user.email);
+    final newUser = AuthUser(
+      id: user.id,
+      isEmailVerified: true,
+      email: user.email,
+    );
     _user = newUser;
     return Future.value();
   }
