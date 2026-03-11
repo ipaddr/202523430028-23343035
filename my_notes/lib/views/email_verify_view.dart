@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_notes/constants/routes.dart';
 import 'package:my_notes/services/auth/auth_exceptions.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
-import 'package:my_notes/utilities/show_error_dialog.dart';
+import 'package:my_notes/utilities/dialogs/error_dialog.dart';
 
 class EmailVerifyView extends StatefulWidget {
   const EmailVerifyView({super.key});
@@ -72,7 +72,8 @@ class _EmailVerifyViewState extends State<EmailVerifyView> {
                       // refresh the user through the auth service
                       await AuthService.firebase().reloadUser();
                       final refreshedUser = AuthService.firebase().currentUser;
-                      if (refreshedUser != null && refreshedUser.isEmailVerified) {
+                      if (refreshedUser != null &&
+                          refreshedUser.isEmailVerified) {
                         messenger.showSnackBar(
                           const SnackBar(
                             content: Text('Email verified successfully.'),
