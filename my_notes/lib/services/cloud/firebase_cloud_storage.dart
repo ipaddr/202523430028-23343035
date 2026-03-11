@@ -6,8 +6,23 @@ import 'package:my_notes/services/cloud/cloud_storage_exceptions.dart';
 class FirebaseCloudStorage {
   final notes = FirebaseFirestore.instance.collection('notes');
 
-  void createNewNote({required String ownerUserId}) async {
-    await notes.add({ownerUserIdField: ownerUserId, noteField: ''});
+  Future<CloudNote> createNewNote({required String ownerUserId}) async {
+    final document = await notes.add({
+      ownerUserIdField: ownerUserId,
+      noteField: '',
+    });
+
+    final fetchedNote = await document.get();
+
+    if (fetchedNote.data() == null) {
+      throw CouldNotCreateNoteException();
+    }
+
+    return CloudNote(
+      documentId: fetchedNote.id,
+      ownerUserId: ownerUserId,
+      text: '',
+    );
   }
 
   Future<Iterable<CloudNote>> getNotes({required String ownerUserId}) async {
@@ -16,13 +31,7 @@ class FirebaseCloudStorage {
           .where(ownerUserIdField, isEqualTo: ownerUserId)
           .get()
           .then(
-            (value) => value.docs.map((doc) {
-              return CloudNote(
-                documentId: doc.id,
-                ownerUserId: doc.data()[ownerUserIdField] as String,
-                text: doc.data()[noteField] as String,
-              );
-            }),
+            (value) => value.docs.map((doc) => CloudNote.fromSnapshot(doc)),
           );
     } catch (e) {
       throw CouldNotGetAllNotesException();

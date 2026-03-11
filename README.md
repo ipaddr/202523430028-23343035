@@ -61,7 +61,7 @@ Implementasi fitur utama catatan menggunakan Stream dan Cloud Database.
 - [x] ⌨️ (22:40:46) Updating Existing Notes
 - [x] ⌨️ (23:14:12) Protecting NotesService with Current User
 - [x] ⌨️ (23:40:44) Writing Notes to Cloud Firestore
-- [ ] ⌨️ (24:58:08) Migrating to our Firestore Service
+- [x] ⌨️ (24:58:08) Migrating to our Firestore Service
 - [ ] ⌨️ (25:22:35) Sharing Notes
 
 ### Minggu 5: State Management (Bloc) & Release Prep
