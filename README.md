@@ -68,7 +68,7 @@ Implementasi fitur utama catatan menggunakan Stream dan Cloud Database.
 
 Optimasi aplikasi menggunakan Bloc dan persiapan rilis.
 
-- [ ] ⌨️ (25:37:43) Introduction to Bloc
+- [x] ⌨️ (25:37:43) Introduction to Bloc
 - [ ] ⌨️ (26:24:31) Converting our Auth Process to Bloc
 - [ ] ⌨️ (27:31:17) Handling Auth Bloc Exceptions During Login
 - [ ] ⌨️ (28:52:45) Moving to Bloc for Routing and Dialogs
