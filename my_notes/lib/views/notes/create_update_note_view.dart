@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/services/cloud/cloud_note.dart';
+import 'package:my_notes/services/cloud/cloud_storage.dart';
 import 'package:my_notes/services/cloud/firebase_cloud_storage.dart';
+import 'package:my_notes/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:my_notes/utilities/generics/get_arguments.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
-  const CreateUpdateNoteView({super.key});
+  /// Optional storage implementation; if omitted the singleton
+  /// [FirebaseCloudStorage] will be used.
+  const CreateUpdateNoteView({super.key, this.cloudStorage});
+
+  final CloudStorage? cloudStorage;
 
   @override
   State<CreateUpdateNoteView> createState() => _CreateUpdateNoteViewState();
@@ -13,12 +20,14 @@ class CreateUpdateNoteView extends StatefulWidget {
 
 class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   CloudNote? _note;
-  late final FirebaseCloudStorage _notesService;
+  // service is accessed through a getter so we can lazily create the
+  // Firebase implementation and easily substitute a fake in tests.
+  CloudStorage get _notesService =>
+      widget.cloudStorage ?? FirebaseCloudStorage();
   late final TextEditingController _textController;
 
   @override
   void initState() {
-    _notesService = FirebaseCloudStorage();
     _textController = TextEditingController();
     super.initState();
   }
@@ -42,7 +51,14 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final widgetNote = context.getArgument<CloudNote>();
 
     if (widgetNote != null) {
-      _note = widgetNote;
+      // make sure the app bar rebuilds so the share icon can enable itself
+      if (mounted) {
+        setState(() {
+          _note = widgetNote;
+        });
+      } else {
+        _note = widgetNote;
+      }
       _textController.text = widgetNote.text;
       return widgetNote;
     }
@@ -55,7 +71,13 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final currentUser = AuthService.firebase().currentUser!;
     final userId = currentUser.id;
     final newNote = await _notesService.createNewNote(ownerUserId: userId);
-    _note = newNote;
+    if (mounted) {
+      setState(() {
+        _note = newNote;
+      });
+    } else {
+      _note = newNote;
+    }
     return newNote;
   }
 
@@ -87,7 +109,22 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create New Note')),
+      appBar: AppBar(
+        title: const Text('Create New Note'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final text = _textController.text;
+              if (_note == null || text.isEmpty) {
+                await showCannotShareEmptyNoteDialog(context);
+              } else {
+                await Share.share(text);
+              }
+            },
+            icon: const Icon(Icons.share),
+          ),
+        ],
+      ),
       body: FutureBuilder(
         future: createOrGetExistingNote(context),
         builder: (context, snapshot) {
