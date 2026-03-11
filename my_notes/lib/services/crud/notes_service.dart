@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:my_notes/extensions/list/filter.dart';
 import 'package:my_notes/services/crud/crud_exception.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
@@ -79,12 +80,21 @@ class DatabaseNote {
 
 class NotesService {
   Database? _db;
+  DatabaseUser? _user;
+
   List<DatabaseNote> _cachedNotes = [];
 
   final _notesStreamController =
       StreamController<List<DatabaseNote>>.broadcast();
 
-  Stream<List<DatabaseNote>> get notesStream => _notesStreamController.stream;
+  Stream<List<DatabaseNote>> get notesStream =>
+      _notesStreamController.stream.filter((note) {
+        final currentUser = _user;
+        if (currentUser == null) {
+          throw UserShouldBeSetBeforeReadingAllNotesException();
+        }
+        return note.userId == currentUser.id;
+      });
 
   static final NotesService _shared = NotesService._sharedInstance();
   NotesService._sharedInstance() {
@@ -118,7 +128,9 @@ class NotesService {
       onCreate: _createTables,
     );
 
-    await _cacheNotes();
+    // don't attempt to cache notes here because we may not know the
+    // currently logged in user yet.  Caching will be triggered when the
+    // user is set (see getOrCreateUser).
   }
 
   Future<void> close() async {
@@ -157,12 +169,25 @@ class NotesService {
     return DatabaseUser(id: id, email: normalized);
   }
 
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
+    DatabaseUser user;
     try {
-      return await getUser(email: email);
+      user = await getUser(email: email);
     } on CouldNotFindUserException {
-      return await createUser(email: email);
+      user = await createUser(email: email);
     }
+
+    if (setAsCurrentUser) {
+      _user = user;
+      // once the current user is known, refresh the cache so any existing
+      // notes stored in the database are pushed to listeners
+      await _cacheNotes();
+    }
+
+    return user;
   }
 
   Future<void> deleteUser({required String email}) async {
@@ -274,8 +299,20 @@ class NotesService {
     _notesStreamController.add(_cachedNotes);
   }
 
+  /// Load notes for the current user into the in‑memory cache.
+  ///
+  /// When the service is first opened we don't yet know which user will be
+  /// viewing the notes, so this method is *not* called from [open]. Instead
+  /// callers should invoke it after [getOrCreateUser] has set [_user].  If
+  /// [_user] is null the cache is cleared and an empty list will be emitted.
   Future<void> _cacheNotes() async {
-    final owner = await getUser(email: '');
+    if (_user == null) {
+      _cachedNotes = [];
+      _notesStreamController.add(_cachedNotes);
+      return;
+    }
+
+    final owner = _user!;
     _cachedNotes = (await getAllNotes(owner: owner)).toList();
     _notesStreamController.add(_cachedNotes);
   }
