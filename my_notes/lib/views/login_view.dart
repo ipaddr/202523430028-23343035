@@ -4,6 +4,7 @@ import 'package:my_notes/constants/routes.dart';
 import 'package:my_notes/services/auth/auth_exceptions.dart';
 import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:my_notes/services/auth/bloc/auth_event.dart';
+import 'package:my_notes/services/auth/bloc/auth_state.dart';
 import 'package:my_notes/utilities/dialogs/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
@@ -59,33 +60,43 @@ class _LoginViewState extends State<LoginView> {
               autofillHints: const [AutofillHints.password],
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () async {
-                final email = emailController.text.trim();
-                final password = passwordController.text.trim();
-
-                try {
+            BlocListener<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthStateLoggedOut) {
+                  if (state.error is WeakPasswordAuthException) {
+                    showErrorDialog(
+                      context,
+                      'The password provided is too weak.',
+                    );
+                  } else if (state.error is EmailAlreadyInUseAuthException) {
+                    showErrorDialog(
+                      context,
+                      'The account already exists for that email.',
+                    );
+                  } else if (state.error is InvalidEmailAuthException) {
+                    showErrorDialog(context, 'The email address is not valid.');
+                  } else if (state.error is UserNotFoundAuthException) {
+                    showErrorDialog(context, 'No user found for that email.');
+                  } else if (state.error is WrongPasswordAuthException) {
+                    showErrorDialog(
+                      context,
+                      'Wrong password provided for that user.',
+                    );
+                  } else if (state.error is GenericAuthException) {
+                    showErrorDialog(context, 'Authentication error occurred.');
+                  }
+                }
+              },
+              child: ElevatedButton(
+                onPressed: () async {
+                  final email = emailController.text.trim();
+                  final password = passwordController.text.trim();
                   context.read<AuthBloc>().add(
                     AuthEventLogin(email: email, password: password),
                   );
-                } on UserNotFoundAuthException {
-                  await showErrorDialog(
-                    context,
-                    'No user found for that email.',
-                  );
-                } on WrongPasswordAuthException {
-                  await showErrorDialog(
-                    context,
-                    'Wrong password provided for that user.',
-                  );
-                } on GenericAuthException {
-                  await showErrorDialog(
-                    context,
-                    'Authentication error occurred.',
-                  );
-                }
-              },
-              child: const Text('Login'),
+                },
+                child: const Text('Login'),
+              ),
             ),
             TextButton(
               onPressed: () {
