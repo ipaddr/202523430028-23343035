@@ -71,7 +71,7 @@ Optimasi aplikasi menggunakan Bloc dan persiapan rilis.
 - [x] ⌨️ (25:37:43) Introduction to Bloc
 - [x] ⌨️ (26:24:31) Converting our Auth Process to Bloc
 - [x] ⌨️ (27:31:17) Handling Auth Bloc Exceptions During Login
-- [ ] ⌨️ (27:52:45) Moving to Bloc for Routing and Dialogs
+- [x] ⌨️ (27:52:45) Moving to Bloc for Routing and Dialogs
 - [ ] ⌨️ (28:58:23) Loading Screens
 - [ ] ⌨️ (29:48:31) Final Touches Before App Release
 - [ ] ⌨️ (30:43:03) App Icons and App Name
