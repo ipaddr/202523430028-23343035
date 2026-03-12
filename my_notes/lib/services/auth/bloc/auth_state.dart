@@ -4,33 +4,41 @@ import 'package:my_notes/services/auth/auth_user.dart';
 
 @immutable
 abstract class AuthState {
-  const AuthState();
+  final bool isLoading;
+  final String? loadingText;
+  const AuthState({
+    required this.isLoading,
+    this.loadingText = 'Please wait a moment',
+  });
 }
 
 class AuthStateUninitialized extends AuthState {
-  const AuthStateUninitialized();
+  const AuthStateUninitialized({required super.isLoading});
 }
 
 class AuthStateRegistering extends AuthState {
   final Exception? exception;
 
-  const AuthStateRegistering({this.exception});
+  const AuthStateRegistering({this.exception, required super.isLoading});
 }
 
 class AuthStateLoggedIn extends AuthState {
   final AuthUser user;
 
-  const AuthStateLoggedIn({required this.user});
+  const AuthStateLoggedIn({required this.user, required super.isLoading});
 }
 
 class AuthStateNeedsVerification extends AuthState {
-  const AuthStateNeedsVerification();
+  const AuthStateNeedsVerification({required super.isLoading});
 }
 
 class AuthStateLoggedOut extends AuthState with EquatableMixin {
   final Exception? error;
-  final bool isLoading;
-  const AuthStateLoggedOut(this.error, this.isLoading);
+  const AuthStateLoggedOut(
+    this.error, {
+    required super.isLoading,
+    super.loadingText = null,
+  });
 
   @override
   List<Object?> get props => [error, isLoading];
