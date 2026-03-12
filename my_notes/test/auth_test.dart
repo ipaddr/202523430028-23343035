@@ -2,6 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:my_notes/services/auth/auth_exceptions.dart';
 import 'package:my_notes/services/auth/auth_provider.dart';
 import 'package:my_notes/services/auth/auth_user.dart';
+import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
+import 'package:my_notes/services/auth/bloc/auth_event.dart';
+import 'package:my_notes/services/auth/bloc/auth_state.dart';
 
 void main() {
   group('Mock Authentication', () {
@@ -120,6 +123,87 @@ void main() {
         expect(another.currentUser, user);
       },
     );
+
+    test('sending password reset with unknown email throws', () async {
+      final fresh = MockAuthProvider();
+      await fresh.initialize();
+      expect(
+        () => fresh.sendPasswordReset(email: 'test@example.com'),
+        throwsA(const TypeMatcher<UserNotFoundAuthException>()),
+      );
+    });
+
+    test('sending password reset succeeds with valid email', () async {
+      final fresh = MockAuthProvider();
+      await fresh.initialize();
+      // first log in a user to mimic registration state (not strictly needed)
+      await fresh.logIn(email: 'user@example.com', password: 'password');
+      await fresh.sendPasswordReset(email: 'user@example.com');
+      // no exception means success
+    });
+  });
+
+  group('AuthBloc forgot password flows', () {
+    late AuthBloc bloc;
+    late MockAuthProvider provider;
+
+    setUp(() {
+      provider = MockAuthProvider();
+      bloc = AuthBloc(provider);
+    });
+
+    test('should navigate to forgot password state', () {
+      expectLater(bloc.stream, emits(isA<AuthStateForgotPassword>()));
+      bloc.add(const AuthEventShouldResetPassword());
+    });
+
+    test('reset password success sequence', () async {
+      await provider.initialize();
+      // prepare a user so provider doesn't throw on valid email
+      await provider.logIn(email: 'user@example.com', password: 'password');
+      expectLater(
+        bloc.stream,
+        emitsInOrder([
+          isA<AuthStateForgotPassword>(),
+          isA<AuthStateForgotPassword>().having(
+            (s) => s.isLoading,
+            'loading',
+            true,
+          ),
+          isA<AuthStateForgotPassword>().having(
+            (s) => s.hasSentEmail,
+            'sentEmail',
+            true,
+          ),
+        ]),
+      );
+      bloc.add(const AuthEventShouldResetPassword());
+      bloc.add(const AuthEventResetPassword(email: 'user@example.com'));
+    });
+
+    test('reset password failure emits exception', () async {
+      await provider.initialize();
+      expectLater(
+        bloc.stream,
+        emitsInOrder([
+          isA<AuthStateForgotPassword>(),
+          isA<AuthStateForgotPassword>().having(
+            (s) => s.isLoading,
+            'loading',
+            true,
+          ),
+          isA<AuthStateForgotPassword>().having(
+            (s) => s.exception,
+            'exception',
+            isNotNull,
+          ),
+        ]),
+      );
+      bloc.add(const AuthEventShouldResetPassword());
+      bloc.add(
+        const AuthEventResetPassword(email: 'test@example.com'),
+      ); // will throw
+    });
   });
 }
 
@@ -198,6 +282,14 @@ class MockAuthProvider implements AuthProvider {
       email: user.email,
     );
     _user = newUser;
+    return Future.value();
+  }
+
+  @override
+  Future<void> sendPasswordReset({required String email}) async {
+    if (!isInitialized) throw NotInitializedException();
+    if (email == 'test@example.com') throw UserNotFoundAuthException();
+    await Future.delayed(const Duration(seconds: 1));
     return Future.value();
   }
 }

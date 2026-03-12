@@ -43,3 +43,15 @@ class AuthStateLoggedOut extends AuthState with EquatableMixin {
   @override
   List<Object?> get props => [error, isLoading];
 }
+
+/// State used when user is on the "forgot password" screen.
+class AuthStateForgotPassword extends AuthState {
+  final Exception? exception;
+  final bool hasSentEmail;
+
+  const AuthStateForgotPassword({
+    this.exception,
+    required super.isLoading,
+    required this.hasSentEmail,
+  });
+}
