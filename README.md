@@ -68,17 +68,17 @@ Implementasi fitur utama catatan menggunakan Stream dan Cloud Database.
 
 Optimasi aplikasi menggunakan Bloc dan persiapan rilis.
 
-- [ ] ⌨️ (25:37:43) Introduction to Bloc
-- [ ] ⌨️ (26:24:31) Converting our Auth Process to Bloc
-- [ ] ⌨️ (27:31:17) Handling Auth Bloc Exceptions During Login
-- [ ] ⌨️ (28:52:45) Moving to Bloc for Routing and Dialogs
-- [ ] ⌨️ (28:58:23) Loading Screens
-- [ ] ⌨️ (29:48:31) Final Touches Before App Release
-- [ ] ⌨️ (30:43:03) App Icons and App Name
-- [ ] ⌨️ (31:06:34) Splash Screen
-- [ ] ⌨️ (31:56:58) Sending our iOS app to App Store Connect
-- [ ] ⌨️ (32:55:44) Releasing our iOS App
-- [ ] ⌨️ (33:20:31) Fixing Firebase Security Rules and Resubmitting the iOS App
+- [x] ⌨️ (25:37:43) Introduction to Bloc
+- [x] ⌨️ (26:24:31) Converting our Auth Process to Bloc
+- [x] ⌨️ (27:31:17) Handling Auth Bloc Exceptions During Login
+- [x] ⌨️ (27:52:45) Moving to Bloc for Routing and Dialogs
+- [x] ⌨️ (28:58:23) Loading Screens
+- [x] ⌨️ (29:48:31) Final Touches Before App Release
+- [x] ⌨️ (30:43:03) App Icons and App Name
+- [x] ⌨️ (31:06:34) Splash Screen
+- [x] ⌨️ (31:56:58) Sending our iOS app to App Store Connect
+- [x] ⌨️ (32:55:44) Releasing our iOS App
+- [x] ⌨️ (33:20:31) Fixing Firebase Security Rules and Resubmitting the iOS App
 
 ### Minggu 6: Android Release & Localization
 
