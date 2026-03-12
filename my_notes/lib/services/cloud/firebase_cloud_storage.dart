@@ -27,19 +27,6 @@ class FirebaseCloudStorage implements CloudStorage {
     );
   }
 
-  Future<Iterable<CloudNote>> getNotes({required String ownerUserId}) async {
-    try {
-      return await notes
-          .where(ownerUserIdField, isEqualTo: ownerUserId)
-          .get()
-          .then(
-            (value) => value.docs.map((doc) => CloudNote.fromSnapshot(doc)),
-          );
-    } catch (e) {
-      throw CouldNotGetAllNotesException();
-    }
-  }
-
   @override
   Future<void> updateNote({
     required String documentId,

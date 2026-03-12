@@ -78,7 +78,7 @@ Optimasi aplikasi menggunakan Bloc dan persiapan rilis.
 - [x] ⌨️ (31:06:34) Splash Screen
 - [x] ⌨️ (31:56:58) Sending our iOS app to App Store Connect
 - [x] ⌨️ (32:55:44) Releasing our iOS App
-- [ ] ⌨️ (33:20:31) Fixing Firebase Security Rules and Resubmitting the iOS App
+- [x] ⌨️ (33:20:31) Fixing Firebase Security Rules and Resubmitting the iOS App
 
 ### Minggu 6: Android Release & Localization
 
