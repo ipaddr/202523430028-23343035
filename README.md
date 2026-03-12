@@ -75,7 +75,7 @@ Optimasi aplikasi menggunakan Bloc dan persiapan rilis.
 - [x] ⌨️ (28:58:23) Loading Screens
 - [x] ⌨️ (29:48:31) Final Touches Before App Release
 - [x] ⌨️ (30:43:03) App Icons and App Name
-- [ ] ⌨️ (31:06:34) Splash Screen
+- [x] ⌨️ (31:06:34) Splash Screen
 - [ ] ⌨️ (31:56:58) Sending our iOS app to App Store Connect
 - [ ] ⌨️ (32:55:44) Releasing our iOS App
 - [ ] ⌨️ (33:20:31) Fixing Firebase Security Rules and Resubmitting the iOS App

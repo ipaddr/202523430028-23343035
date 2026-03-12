@@ -12,6 +12,7 @@ import 'package:my_notes/views/login_view.dart';
 import 'package:my_notes/views/notes/create_update_note_view.dart';
 import 'package:my_notes/views/notes/notes_view.dart';
 import 'package:my_notes/views/register_view.dart';
+import 'package:my_notes/views/splash_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,7 +64,9 @@ class HomePage extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        if (state is AuthStateLoggedIn) {
+        if (state is AuthStateUninitialized) {
+          return const SplashView();
+        } else if (state is AuthStateLoggedIn) {
           return const NotesView();
         } else if (state is AuthStateNeedsVerification) {
           return const EmailVerifyView();
@@ -74,6 +77,7 @@ class HomePage extends StatelessWidget {
         } else if (state is AuthStateRegistering) {
           return const RegisterView();
         } else {
+          // fallback while loading/unknown
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
