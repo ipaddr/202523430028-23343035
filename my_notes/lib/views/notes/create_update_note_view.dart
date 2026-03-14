@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_notes/services/auth/auth_provider.dart';
 import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/services/cloud/cloud_note.dart';
 import 'package:my_notes/services/cloud/cloud_storage.dart';
@@ -7,12 +8,21 @@ import 'package:my_notes/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:my_notes/utilities/generics/get_arguments.dart';
 import 'package:share_plus/share_plus.dart';
 
+/// Screen for creating a new note or updating an existing one.
+///
+/// Accepts optional [cloudStorage] and [authProvider] dependencies so that
+/// the widget can be tested without a real Firebase back-end.  When either
+/// dependency is omitted the production singleton is used instead, satisfying
+/// the Dependency-Inversion Principle without breaking the existing call sites
+/// in production code.
 class CreateUpdateNoteView extends StatefulWidget {
-  /// Optional storage implementation; if omitted the singleton
-  /// [FirebaseCloudStorage] will be used.
-  const CreateUpdateNoteView({super.key, this.cloudStorage});
-
+  /// Optional storage implementation; defaults to [FirebaseCloudStorage].
   final CloudStorage? cloudStorage;
+
+  /// Optional auth provider; defaults to [AuthService.firebase()].
+  final AuthProvider? authProvider;
+
+  const CreateUpdateNoteView({super.key, this.cloudStorage, this.authProvider});
 
   @override
   State<CreateUpdateNoteView> createState() => _CreateUpdateNoteViewState();
@@ -20,10 +30,15 @@ class CreateUpdateNoteView extends StatefulWidget {
 
 class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   CloudNote? _note;
-  // service is accessed through a getter so we can lazily create the
-  // Firebase implementation and easily substitute a fake in tests.
+
+  /// Resolves the [CloudStorage] to use — injected or the Firebase singleton.
   CloudStorage get _notesService =>
       widget.cloudStorage ?? FirebaseCloudStorage();
+
+  /// Resolves the [AuthProvider] to use — injected or the Firebase singleton.
+  AuthProvider get _authProvider =>
+      widget.authProvider ?? AuthService.firebase();
+
   late final TextEditingController _textController;
 
   @override
@@ -47,11 +62,14 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     _textController.addListener(_textControllerListener);
   }
 
+  /// Returns the note to edit.
+  ///
+  /// If a [CloudNote] was passed as a route argument it is used directly.
+  /// Otherwise a new note is created in the storage back-end.
   Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
     final widgetNote = context.getArgument<CloudNote>();
 
     if (widgetNote != null) {
-      // make sure the app bar rebuilds so the share icon can enable itself
       if (mounted) {
         setState(() {
           _note = widgetNote;
@@ -68,8 +86,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       return existingNote;
     }
 
-    final currentUser = AuthService.firebase().currentUser!;
-    final userId = currentUser.id;
+    final userId = _authProvider.currentUser!.id;
     final newNote = await _notesService.createNewNote(ownerUserId: userId);
     if (mounted) {
       setState(() {

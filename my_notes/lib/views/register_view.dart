@@ -6,6 +6,10 @@ import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/services/auth/bloc/auth_state.dart';
 import 'package:my_notes/utilities/dialogs/error_dialog.dart';
 
+/// Screen that lets a new user create an account with email and password.
+///
+/// Listens to [AuthBloc] and shows an appropriate error dialog when
+/// registration fails.
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
@@ -47,8 +51,6 @@ class _RegisterViewState extends State<RegisterView> {
               'The account already exists for that email.',
             );
           } else if (state.exception is InvalidEmailAuthException) {
-            await showErrorDialog(context, 'The email address is invalid.');
-          } else if (state.exception is GenericAuthException) {
             await showErrorDialog(context, 'The email address is invalid.');
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(

@@ -143,6 +143,64 @@ void main() {
     });
   });
 
+  // ── Exception type hierarchy ─────────────────────────────────────────────
+
+  group('Auth exception types', () {
+    test('UserNotFoundAuthException implements Exception', () {
+      expect(UserNotFoundAuthException(), isA<Exception>());
+    });
+
+    test('WrongPasswordAuthException implements Exception', () {
+      expect(WrongPasswordAuthException(), isA<Exception>());
+    });
+
+    test('WeakPasswordAuthException implements Exception', () {
+      expect(WeakPasswordAuthException(), isA<Exception>());
+    });
+
+    test('EmailAlreadyInUseAuthException implements Exception', () {
+      expect(EmailAlreadyInUseAuthException(), isA<Exception>());
+    });
+
+    test('InvalidEmailAuthException implements Exception', () {
+      expect(InvalidEmailAuthException(), isA<Exception>());
+    });
+
+    test('GenericAuthException implements Exception', () {
+      expect(GenericAuthException(), isA<Exception>());
+    });
+
+    test('UserNotLoggedInAuthException implements Exception', () {
+      expect(UserNotLoggedInAuthException(), isA<Exception>());
+    });
+  });
+
+  // ── AuthUser ─────────────────────────────────────────────────────────────
+
+  group('AuthUser', () {
+    test('stores id, email, and isEmailVerified correctly', () {
+      const user = AuthUser(
+        id: 'uid123',
+        email: 'test@example.com',
+        isEmailVerified: false,
+      );
+      expect(user.id, 'uid123');
+      expect(user.email, 'test@example.com');
+      expect(user.isEmailVerified, false);
+    });
+
+    test('can be created with isEmailVerified = true', () {
+      const user = AuthUser(
+        id: 'uid',
+        email: 'a@b.com',
+        isEmailVerified: true,
+      );
+      expect(user.isEmailVerified, true);
+    });
+  });
+
+  // ── AuthBloc ─────────────────────────────────────────────────────────────
+
   group('AuthBloc forgot password flows', () {
     late AuthBloc bloc;
     late MockAuthProvider provider;
@@ -205,13 +263,104 @@ void main() {
       ); // will throw
     });
   });
+
+  group('AuthBloc registration flow', () {
+    late AuthBloc bloc;
+    late MockAuthProvider provider;
+
+    setUp(() {
+      provider = MockAuthProvider();
+      bloc = AuthBloc(provider);
+    });
+
+    test('AuthEventShouldRegister transitions to AuthStateRegistering', () {
+      expectLater(bloc.stream, emits(isA<AuthStateRegistering>()));
+      bloc.add(const AuthEventShouldRegister());
+    });
+
+    test('successful registration transitions to AuthStateNeedsVerification',
+        () async {
+      await provider.initialize();
+      expectLater(
+        bloc.stream,
+        emitsThrough(isA<AuthStateNeedsVerification>()),
+      );
+      bloc.add(
+        const AuthEventRegister(
+          email: 'user@example.com',
+          password: 'password',
+        ),
+      );
+    });
+
+    test('failed registration emits AuthStateRegistering with exception',
+        () async {
+      await provider.initialize();
+      expectLater(
+        bloc.stream,
+        emitsThrough(
+          isA<AuthStateRegistering>().having(
+            (s) => s.exception,
+            'exception',
+            isNotNull,
+          ),
+        ),
+      );
+      bloc.add(
+        const AuthEventRegister(
+          email: 'test@example.com', // triggers UserNotFoundAuthException
+          password: 'password',
+        ),
+      );
+    });
+  });
+
+  group('AuthBloc login flow', () {
+    late AuthBloc bloc;
+    late MockAuthProvider provider;
+
+    setUp(() {
+      provider = MockAuthProvider();
+      bloc = AuthBloc(provider);
+    });
+
+    test('login with uninitialized provider emits AuthStateLoggedOut with error',
+        () {
+      expectLater(
+        bloc.stream,
+        emitsThrough(
+          isA<AuthStateLoggedOut>().having(
+            (s) => s.error,
+            'error',
+            isNotNull,
+          ),
+        ),
+      );
+      bloc.add(
+        const AuthEventLogin(email: 'any@any.com', password: 'pass'),
+      );
+    });
+  });
 }
 
+// ── Test doubles ─────────────────────────────────────────────────────────────
+
+/// Sentinel exception thrown by [MockAuthProvider] when a method is called
+/// before [MockAuthProvider.initialize].
 class NotInitializedException implements Exception {}
 
+/// In-memory [AuthProvider] used in unit tests.
+///
+/// All credentials are hardcoded:
+/// - Any email other than `test@example.com` with the password `password`
+///   will succeed.
+/// - `test@example.com` always triggers [UserNotFoundAuthException].
+/// - Any password other than `password` triggers [WrongPasswordAuthException].
 class MockAuthProvider implements AuthProvider {
   AuthUser? _user;
   var _isInitialized = false;
+
+  /// Whether [initialize] has been called on this provider.
   bool get isInitialized => _isInitialized;
 
   @override
@@ -238,11 +387,7 @@ class MockAuthProvider implements AuthProvider {
   Future<AuthUser> logIn({required String email, required String password}) {
     if (!isInitialized) throw NotInitializedException();
     if (email == 'test@example.com') throw UserNotFoundAuthException();
-    // throw when the *provided* password is wrong, not when it matches a hardcoded
-    // value. All tests treat "password" as the correct credential.
     if (password != 'password') throw WrongPasswordAuthException();
-    // generate a crude unique id; in real life you'd use a UUID or
-    // Firebase uid.
     final generatedId = DateTime.now().millisecondsSinceEpoch.toString();
     final user = AuthUser(
       id: generatedId,
@@ -267,7 +412,6 @@ class MockAuthProvider implements AuthProvider {
     if (!isInitialized) throw NotInitializedException();
     final user = _user;
     if (user == null) throw UserNotFoundAuthException();
-    // mimic a network delay as other methods do
     await Future.delayed(const Duration(seconds: 1));
   }
 

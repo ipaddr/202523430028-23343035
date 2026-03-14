@@ -7,6 +7,13 @@ import 'package:my_notes/services/auth/bloc/auth_state.dart';
 import 'package:my_notes/utilities/dialogs/error_dialog.dart';
 import 'package:my_notes/utilities/dialogs/generic_dialog.dart';
 
+/// Screen that lets a user request a password-reset email.
+///
+/// Listens to [AuthBloc] for [AuthStateForgotPassword] states:
+/// - When [AuthStateForgotPassword.exception] is non-null an error dialog is
+///   shown.
+/// - When [AuthStateForgotPassword.hasSentEmail] is `true` a success dialog
+///   is shown and the user is then sent back to the login screen.
 class ForgotPasswordView extends StatefulWidget {
   const ForgotPasswordView({super.key});
 
@@ -46,8 +53,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
               );
             }
           } else if (state.hasSentEmail) {
-            // capture bloc reference before awaiting so we don't touch
-            // context after the async gap
+            // Capture the bloc reference before the async gap so that we
+            // never call context.read after the widget might have unmounted.
             final authBloc = context.read<AuthBloc>();
             await showGenericDialog<bool>(
               context: context,

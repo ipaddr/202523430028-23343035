@@ -3,6 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:my_notes/services/auth/bloc/auth_event.dart';
 
+/// Screen shown after registration when the user's email has not yet been
+/// verified.
+///
+/// Allows the user to request another verification email or to navigate back
+/// to the login screen by dispatching [AuthEventLogout].
 class EmailVerifyView extends StatefulWidget {
   const EmailVerifyView({super.key});
 

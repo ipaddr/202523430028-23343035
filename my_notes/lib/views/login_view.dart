@@ -6,6 +6,10 @@ import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/services/auth/bloc/auth_state.dart';
 import 'package:my_notes/utilities/dialogs/error_dialog.dart';
 
+/// Login screen that authenticates an existing user.
+///
+/// Listens to [AuthBloc] for [AuthStateLoggedOut] states that carry an error
+/// and shows an appropriate dialog for each known exception type.
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 

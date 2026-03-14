@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// Splash / launch screen shown while the auth state is being resolved.
+///
+/// Displays the app icon and the application name in the centre of the screen.
 class SplashView extends StatelessWidget {
   const SplashView({super.key});
 

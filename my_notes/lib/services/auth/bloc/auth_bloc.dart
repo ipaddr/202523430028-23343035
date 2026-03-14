@@ -3,14 +3,25 @@ import 'package:my_notes/services/auth/auth_provider.dart';
 import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/services/auth/bloc/auth_state.dart';
 
+/// BLoC that manages the authentication lifecycle of the application.
+///
+/// Accepts [AuthEvent]s and maps them to [AuthState]s by delegating the
+/// actual auth operations to the injected [AuthProvider].  Because the bloc
+/// only knows about the abstract [AuthProvider] interface, the concrete
+/// implementation (Firebase, mock, etc.) can be swapped without modifying
+/// this class — satisfying both the Open/Closed and Dependency-Inversion
+/// Principles.
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  /// Creates an [AuthBloc] backed by the given [provider].
   AuthBloc(AuthProvider provider)
     : super(const AuthStateUninitialized(isLoading: false)) {
+    // ── Email verification ─────────────────────────────────────────────────
     on<AuthEventSendEmailVerification>((event, emit) async {
       await provider.sendEmailVerification();
       emit(state);
     });
 
+    // ── Registration ───────────────────────────────────────────────────────
     on<AuthEventRegister>((event, emit) async {
       final email = event.email;
       final password = event.password;
@@ -24,6 +35,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
+    // ── Initialisation ─────────────────────────────────────────────────────
     on<AuthEventInitialize>((event, emit) async {
       await provider.initialize();
       final user = provider.currentUser;
@@ -36,19 +48,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-    // show registration screen
+    // ── Navigate to registration screen ────────────────────────────────────
     on<AuthEventShouldRegister>((event, emit) {
       emit(const AuthStateRegistering(isLoading: false));
     });
 
-    // show forgot password screen
+    // ── Navigate to forgot-password screen ─────────────────────────────────
     on<AuthEventShouldResetPassword>((event, emit) {
       emit(
         const AuthStateForgotPassword(isLoading: false, hasSentEmail: false),
       );
     });
 
-    // actually perform reset email request
+    // ── Send password-reset email ──────────────────────────────────────────
     on<AuthEventResetPassword>((event, emit) async {
       final email = event.email;
       emit(const AuthStateForgotPassword(isLoading: true, hasSentEmail: false));
@@ -68,8 +80,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
+    // ── Login ──────────────────────────────────────────────────────────────
     on<AuthEventLogin>((event, emit) async {
-      // show loading state while login request in progress
       emit(const AuthStateLoggedOut(null, isLoading: true));
       final email = event.email;
       final password = event.password;
@@ -89,6 +101,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
+    // ── Logout ─────────────────────────────────────────────────────────────
     on<AuthEventLogout>((event, emit) async {
       try {
         await provider.logOut();

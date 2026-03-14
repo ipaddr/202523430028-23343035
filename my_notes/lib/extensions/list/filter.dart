@@ -1,14 +1,20 @@
-/// Helpers for a stream that emits lists.
+/// Extension methods for streams whose events are [List]s.
 ///
-/// The built‑in `Stream.where` filters events, not the contents of a list.
-/// This extension makes it easy to apply a predicate to every element of
-/// each list that flows through the stream.
+/// The built-in [Stream.where] filters events at the stream level, not the
+/// contents of each list.  This extension adds [filter] which applies a
+/// predicate to every *element* of each emitted list, producing a new stream
+/// of filtered lists without modifying the originals.
 extension StreamListFilter<T> on Stream<List<T>> {
-  /// Return a stream of lists in which every element satisfies
-  /// [predicate].
+  /// Returns a new stream where every emitted list contains only the elements
+  /// that satisfy [predicate].
   ///
-  /// The original lists are not mutated – a new filtered list is created
-  /// for each event.
+  /// Each incoming list is transformed with `where` and collected into a new
+  /// list before being re-emitted.  The original lists are never mutated.
+  ///
+  /// Example:
+  /// ```dart
+  /// stream.filter((note) => note.userId == currentUserId);
+  /// ```
   Stream<List<T>> filter(bool Function(T element) predicate) =>
       map((items) => items.where(predicate).toList());
 }

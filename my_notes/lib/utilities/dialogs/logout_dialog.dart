@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:my_notes/utilities/dialogs/generic_dialog.dart';
 
+/// Shows a confirmation dialog asking the user whether they want to log out.
+///
+/// Returns `true` if the user confirmed the logout, or `false` if they
+/// cancelled.
 Future<bool> showLogoutDialog(BuildContext context) {
   return showGenericDialog<bool>(
     context: context,

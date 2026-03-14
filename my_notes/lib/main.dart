@@ -14,12 +14,17 @@ import 'package:my_notes/views/notes/notes_view.dart';
 import 'package:my_notes/views/register_view.dart';
 import 'package:my_notes/views/splash_view.dart';
 
+/// Entry point of the application.
+///
+/// Initialises Flutter bindings before running the widget tree.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(const MainApp());
 }
 
+/// Root widget that configures global theming and injects [AuthBloc] at the
+/// top of the widget tree.
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -29,7 +34,6 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'My Notes',
       theme: ThemeData(
-        // custom colors
         primaryColor: const Color(0xFF004643), // Cyprus
         scaffoldBackgroundColor: const Color(0xFFFAFAFA), // Cloud White
         appBarTheme: const AppBarTheme(
@@ -48,6 +52,11 @@ class MainApp extends StatelessWidget {
   }
 }
 
+/// Root home widget that listens to [AuthBloc] and routes the user to the
+/// appropriate screen based on the current [AuthState].
+///
+/// Also manages the global loading overlay: it is shown whenever
+/// [AuthState.isLoading] is `true` and hidden otherwise.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -56,7 +65,6 @@ class HomePage extends StatelessWidget {
     context.read<AuthBloc>().add(const AuthEventInitialize());
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        // show or hide the loading overlay based on the state's flag
         if (state.isLoading) {
           LoadingScreen().show(context: context, text: 'Loading...');
         } else {
@@ -77,7 +85,6 @@ class HomePage extends StatelessWidget {
         } else if (state is AuthStateRegistering) {
           return const RegisterView();
         } else {
-          // fallback while loading/unknown
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );

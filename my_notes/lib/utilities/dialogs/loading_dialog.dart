@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
+/// Callback type that closes the loading dialog when invoked.
 typedef CloseDialog = void Function();
 
+/// Shows a transparent loading dialog with a [CircularProgressIndicator] and
+/// a [text] label.
+///
+/// Returns a [CloseDialog] callback that, when called, dismisses the dialog
+/// by popping the current route.
 CloseDialog showLoadingDialog({
   required BuildContext context,
   required String text,

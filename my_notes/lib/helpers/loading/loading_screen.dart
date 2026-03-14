@@ -3,28 +3,46 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:my_notes/helpers/loading/loading_screen_controller.dart';
 
+/// Singleton that manages a full-screen loading overlay.
+///
+/// Call [show] to display (or update) the overlay and [hide] to dismiss it.
+/// Because this class is a singleton, only one overlay can be active at a
+/// time; calling [show] while an overlay is already visible simply updates
+/// its text via [LoadingScreenController.update].
 class LoadingScreen {
+  /// Returns the shared [LoadingScreen] singleton.
   factory LoadingScreen() => _shared;
+
   static final LoadingScreen _shared = LoadingScreen._sharedInstance();
   LoadingScreen._sharedInstance();
 
+  /// The controller for the currently-visible overlay, or `null` if no
+  /// overlay is shown.
   LoadingScreenController? controller;
 
+  /// Shows the loading overlay with the given [text].
+  ///
+  /// If an overlay is already visible its text is updated instead of creating
+  /// a new one.
   void show({required BuildContext context, required String text}) {
     if (controller != null) {
-      // already showing, just update the text
       controller!.update(text);
     } else {
-      controller = showOverlay(context: context, text: text);
+      controller = _showOverlay(context: context, text: text);
     }
   }
 
+  /// Hides the loading overlay if it is currently visible.
   void hide() {
     controller?.close();
     controller = null;
   }
 
-  LoadingScreenController showOverlay({
+  /// Inserts a new overlay entry into the nearest [Overlay] and returns a
+  /// [LoadingScreenController] to manage it.
+  ///
+  /// Prefer [show] over calling this method directly.
+  LoadingScreenController _showOverlay({
     required BuildContext context,
     required String text,
   }) {
@@ -78,7 +96,8 @@ class LoadingScreen {
     );
 
     state.insert(overlay);
-    controller = LoadingScreenController(
+
+    final screenController = LoadingScreenController(
       close: () {
         textController.close();
         overlay.remove();
@@ -86,6 +105,7 @@ class LoadingScreen {
       },
       update: (text) => textController.add(text),
     );
-    return controller!;
+    controller = screenController;
+    return screenController;
   }
 }
