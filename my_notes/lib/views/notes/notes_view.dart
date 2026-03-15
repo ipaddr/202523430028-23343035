@@ -6,25 +6,29 @@ import 'package:my_notes/services/auth/auth_service.dart';
 import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/services/cloud/cloud_note.dart';
+import 'package:my_notes/services/cloud/cloud_storage.dart';
 import 'package:my_notes/services/cloud/firebase_cloud_storage.dart';
 import 'package:my_notes/utilities/dialogs/logout_dialog.dart';
 import 'package:my_notes/views/notes/notes_list_view.dart';
 
 class NotesView extends StatefulWidget {
-  const NotesView({super.key});
+  /// Optional storage implementation; defaults to [FirebaseCloudStorage].
+  const NotesView({super.key, this.cloudStorage});
+
+  final CloudStorage? cloudStorage;
 
   @override
   State<NotesView> createState() => _NotesViewState();
 }
 
 class _NotesViewState extends State<NotesView> {
-  late final FirebaseCloudStorage _notesService;
+  late final CloudStorage _notesService;
 
   String get userId => AuthService.firebase().currentUser!.id;
 
   @override
   void initState() {
-    _notesService = FirebaseCloudStorage();
+    _notesService = widget.cloudStorage ?? FirebaseCloudStorage();
     super.initState();
   }
 
@@ -70,7 +74,9 @@ class _NotesViewState extends State<NotesView> {
                 return NotesListView(
                   notes: allNotes,
                   onDeleteNote: (note) async {
-                    await _notesService.deleteNote(documentId: note.documentId);
+                    await _notesService.deleteNote(
+                      documentId: note.documentId,
+                    );
                   },
                   onTap: (CloudNote note) {
                     Navigator.of(
@@ -82,7 +88,7 @@ class _NotesViewState extends State<NotesView> {
                 return const Center(child: Text('No notes found'));
               }
             default:
-              return Center(child: const CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
           }
         },
       ),

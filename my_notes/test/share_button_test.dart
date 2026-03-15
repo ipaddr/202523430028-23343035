@@ -21,6 +21,10 @@ class FakeCloudStorage implements CloudStorage {
 
   @override
   Future<void> deleteNote({required String documentId}) async {}
+
+  @override
+  Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) =>
+      const Stream.empty();
 }
 
 void main() {
