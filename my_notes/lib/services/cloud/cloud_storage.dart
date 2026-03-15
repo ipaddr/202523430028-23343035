@@ -17,4 +17,7 @@ abstract class CloudStorage {
 
   /// Deletes a note by its document ID.
   Future<void> deleteNote({required String documentId});
+
+  /// Returns a real-time stream of all notes belonging to [ownerUserId].
+  Stream<Iterable<CloudNote>> allNotes({required String ownerUserId});
 }

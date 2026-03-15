@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_notes/services/auth/auth_exceptions.dart';
 import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/services/auth/bloc/auth_state.dart';
+import 'package:my_notes/utilities/auth/auth_error_messages.dart';
 import 'package:my_notes/utilities/dialogs/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
@@ -36,27 +36,9 @@ class _LoginViewState extends State<LoginView> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateLoggedOut) {
-          if (state.error is WeakPasswordAuthException) {
-            await showErrorDialog(
-              context,
-              'The password provided is too weak.',
-            );
-          } else if (state.error is EmailAlreadyInUseAuthException) {
-            await showErrorDialog(
-              context,
-              'The account already exists for that email.',
-            );
-          } else if (state.error is InvalidEmailAuthException) {
-            await showErrorDialog(context, 'The email address is not valid.');
-          } else if (state.error is UserNotFoundAuthException) {
-            await showErrorDialog(context, 'No user found for that email.');
-          } else if (state.error is WrongPasswordAuthException) {
-            await showErrorDialog(
-              context,
-              'Wrong password provided for that user.',
-            );
-          } else if (state.error is GenericAuthException) {
-            await showErrorDialog(context, 'Authentication error occurred.');
+          final message = loginErrorMessage(state.error);
+          if (message != null) {
+            await showErrorDialog(context, message);
           }
         }
       },
@@ -87,7 +69,7 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () async {
+                onPressed: () {
                   final email = emailController.text.trim();
                   final password = passwordController.text.trim();
                   context.read<AuthBloc>().add(

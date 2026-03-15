@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_notes/services/auth/auth_exceptions.dart';
 import 'package:my_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:my_notes/services/auth/bloc/auth_event.dart';
 import 'package:my_notes/services/auth/bloc/auth_state.dart';
+import 'package:my_notes/utilities/auth/auth_error_messages.dart';
 import 'package:my_notes/utilities/dialogs/error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
@@ -36,25 +36,9 @@ class _RegisterViewState extends State<RegisterView> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateRegistering) {
-          if (state.exception is WeakPasswordAuthException) {
-            await showErrorDialog(
-              context,
-              'The password provided is too weak.',
-            );
-          } else if (state.exception is EmailAlreadyInUseAuthException) {
-            await showErrorDialog(
-              context,
-              'The account already exists for that email.',
-            );
-          } else if (state.exception is InvalidEmailAuthException) {
-            await showErrorDialog(context, 'The email address is invalid.');
-          } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(context, 'The email address is invalid.');
-          } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(
-              context,
-              'Failed to register. Please try again.',
-            );
+          final message = registerErrorMessage(state.exception);
+          if (message != null) {
+            await showErrorDialog(context, message);
           }
         }
       },
@@ -89,7 +73,7 @@ class _RegisterViewState extends State<RegisterView> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () async {
+                onPressed: () {
                   final email = emailController.text.trim();
                   final password = passwordController.text.trim();
 
